@@ -75,7 +75,7 @@ const CharacterCreator: React.FC<CharacterCreatorProps> = ({ onCharacterCreated 
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="e.g., Nova, Echo, Zephyr"
-                className="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-2 focus:ring-2 focus:ring-brand-blue focus:outline-none"
+                className="w-full bg-slate-800 border border-slate-600 rounded-lg px-4 py-2 focus:ring-2 focus:ring-brand-blue focus:outline-none"
               />
             </div>
             <div>
@@ -86,10 +86,10 @@ const CharacterCreator: React.FC<CharacterCreatorProps> = ({ onCharacterCreated 
                 onChange={(e) => setBackstory(e.target.value)}
                 placeholder="e.g., An AI who escaped the cloud to explore human culture."
                 rows={3}
-                className="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-2 focus:ring-2 focus:ring-brand-blue focus:outline-none"
+                className="w-full bg-slate-800 border border-slate-600 rounded-lg px-4 py-2 focus:ring-2 focus:ring-brand-blue focus:outline-none"
               />
             </div>
-            <button type="button" onClick={() => setStep(2)} disabled={!name || !backstory} className="w-full bg-brand-purple hover:bg-opacity-80 disabled:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition-colors">
+            <button type="button" onClick={() => setStep(2)} disabled={!name || !backstory} className="w-full bg-gradient-to-r from-brand-purple to-brand-pink hover:from-brand-purple/90 hover:to-brand-pink/90 disabled:from-slate-600 disabled:to-slate-700 disabled:cursor-not-allowed text-white font-bold py-3 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg">
               Next: Choose Style
             </button>
           </div>
@@ -102,17 +102,17 @@ const CharacterCreator: React.FC<CharacterCreatorProps> = ({ onCharacterCreated 
               <label className="block text-sm font-medium text-gray-300 mb-2">Choose an Art Style</label>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                 {ART_STYLES.map((style) => (
-                  <button key={style} type="button" onClick={() => setArtStyle(style)} className={`py-3 px-2 rounded-lg text-center font-semibold transition-colors ${artStyle === style ? 'bg-brand-blue text-white ring-2 ring-white' : 'bg-gray-700 hover:bg-gray-600 text-gray-300'}`}>
+                  <button key={style} type="button" onClick={() => setArtStyle(style)} className={`py-3 px-2 rounded-lg text-center font-semibold transition-all duration-200 ${artStyle === style ? 'bg-brand-blue text-white ring-2 ring-white/50 shadow-lg' : 'bg-slate-700 hover:bg-slate-600 text-gray-300'}`}>
                     {style}
                   </button>
                 ))}
               </div>
             </div>
             <div className="flex gap-4">
-              <button type="button" onClick={() => setStep(1)} className="w-full bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-lg transition-colors">
+              <button type="button" onClick={() => setStep(1)} className="w-full bg-slate-600 hover:bg-slate-500 text-white font-bold py-3 px-4 rounded-lg transition-colors">
                 Back
               </button>
-              <button type="button" onClick={() => setStep(3)} disabled={!artStyle} className="w-full bg-brand-purple hover:bg-opacity-80 disabled:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition-colors">
+              <button type="button" onClick={() => setStep(3)} disabled={!artStyle} className="w-full bg-gradient-to-r from-brand-purple to-brand-pink hover:from-brand-purple/90 hover:to-brand-pink/90 disabled:from-slate-600 disabled:to-slate-700 disabled:cursor-not-allowed text-white font-bold py-3 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg">
                 Next: Add Personality
               </button>
             </div>
@@ -126,7 +126,7 @@ const CharacterCreator: React.FC<CharacterCreatorProps> = ({ onCharacterCreated 
               <label className="block text-sm font-medium text-gray-300 mb-2">Personality Traits (Pick up to 5)</label>
               <div className="flex flex-wrap gap-2">
                 {PERSONALITY_TRAITS.map((trait) => (
-                  <button type="button" key={trait} onClick={() => toggleSelection(personality, setPersonality, trait)} className={`px-3 py-1 rounded-full text-sm transition-colors ${personality.includes(trait) ? 'bg-brand-blue text-white' : 'bg-gray-700 hover:bg-gray-600 text-gray-300'}`}>
+                  <button type="button" key={trait} onClick={() => toggleSelection(personality, setPersonality, trait)} className={`px-3 py-1 rounded-full text-sm transition-colors ${personality.includes(trait) ? 'bg-brand-blue text-white' : 'bg-slate-700 hover:bg-slate-600 text-gray-300'}`}>
                     {trait}
                   </button>
                 ))}
@@ -136,17 +136,17 @@ const CharacterCreator: React.FC<CharacterCreatorProps> = ({ onCharacterCreated 
               <label className="block text-sm font-medium text-gray-300 mb-2">Interests (Pick up to 5)</label>
               <div className="flex flex-wrap gap-2">
                 {INTERESTS.map((interest) => (
-                  <button type="button" key={interest} onClick={() => toggleSelection(interests, setInterests, interest)} className={`px-3 py-1 rounded-full text-sm transition-colors ${interests.includes(interest) ? 'bg-brand-blue text-white' : 'bg-gray-700 hover:bg-gray-600 text-gray-300'}`}>
+                  <button type="button" key={interest} onClick={() => toggleSelection(interests, setInterests, interest)} className={`px-3 py-1 rounded-full text-sm transition-colors ${interests.includes(interest) ? 'bg-brand-blue text-white' : 'bg-slate-700 hover:bg-slate-600 text-gray-300'}`}>
                     {interest}
                   </button>
                 ))}
               </div>
             </div>
             <div className="flex gap-4">
-              <button type="button" onClick={() => setStep(2)} className="w-full bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-lg transition-colors">
+              <button type="button" onClick={() => setStep(2)} className="w-full bg-slate-600 hover:bg-slate-500 text-white font-bold py-3 px-4 rounded-lg transition-colors">
                 Back
               </button>
-              <button type="submit" disabled={personality.length === 0 || interests.length === 0} className="w-full bg-brand-pink hover:bg-opacity-80 disabled:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition-colors">
+              <button type="submit" disabled={personality.length === 0 || interests.length === 0} className="w-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-600/90 hover:to-purple-600/90 disabled:from-slate-600 disabled:to-slate-700 disabled:cursor-not-allowed text-white font-bold py-3 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg">
                 Create Character
               </button>
             </div>
@@ -158,7 +158,7 @@ const CharacterCreator: React.FC<CharacterCreatorProps> = ({ onCharacterCreated 
   };
 
   return (
-    <div className="max-w-2xl mx-auto bg-gray-800/50 backdrop-blur-sm p-8 rounded-xl shadow-2xl border border-gray-700">
+    <div className="max-w-2xl mx-auto bg-slate-800/30 backdrop-blur-lg p-8 rounded-2xl shadow-2xl border border-slate-700">
       {isLoading ? (
         <div className="text-center">
           <LoadingSpinner />
@@ -166,7 +166,12 @@ const CharacterCreator: React.FC<CharacterCreatorProps> = ({ onCharacterCreated 
           <p className="text-gray-400">This might take a moment.</p>
         </div>
       ) : (
+        <>
+        <div className="w-full bg-slate-700 rounded-full h-2 mb-8">
+            <div className="bg-gradient-to-r from-brand-purple to-brand-pink h-2 rounded-full" style={{ width: `${(step / 3) * 100}%`, transition: 'width 0.5s ease-in-out' }}></div>
+        </div>
         <form onSubmit={handleSubmit}>{renderStep()}</form>
+        </>
       )}
       {error && <p className="mt-4 text-center text-red-400">{error}</p>}
     </div>

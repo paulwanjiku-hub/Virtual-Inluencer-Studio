@@ -34,22 +34,39 @@ export const generateCharacterImage = async (visualDescription: string, artStyle
 const generateVideoForScenario = async (scenario: string, characterDescription: string): Promise<string | undefined> => {
   console.log("Starting video generation...");
   try {
-    const prompt = `A short, cinematic video clip of ${characterDescription}. Scenario: "${scenario}". This is for a social media short or reel. High quality, visually engaging.`;
+    const prompt = `Create a high-quality, cinematic video clip suitable for a social media reel or short, featuring: ${characterDescription}. The scene is: "${scenario}". Prioritize dynamic, cinematic shots (e.g., close-ups, wide shots) with smooth transitions. The video should tell a coherent visual story based on the scenario. Focus on high-fidelity rendering and a polished aesthetic.`;
     
     let operation = await ai.models.generateVideos({
-      model: 'veo-2-generate-001',
+      model: 'veo-2.0-generate-001',
       prompt: prompt,
       config: {
         numberOfVideos: 1
       }
     });
 
-    // Poll for completion, as video generation is asynchronous and takes time.
-    while (!operation.done) {
-      console.log("Polling video generation status... Please wait.");
-      // Wait for 10 seconds before checking the status again.
-      await new Promise(resolve => setTimeout(resolve, 10000));
-      operation = await ai.operations.getVideosOperation({ operation });
+    // Poll for completion with exponential backoff for robustness.
+    let attempts = 0;
+    const maxAttempts = 12; // ~5 minutes timeout with this strategy
+    let delay = 5000; // Start with 5 seconds
+
+    while (!operation.done && attempts < maxAttempts) {
+      attempts++;
+      console.log(`Polling video generation status (attempt ${attempts})... waiting ${delay / 1000}s.`);
+      await new Promise(resolve => setTimeout(resolve, delay));
+      
+      try {
+          operation = await ai.operations.getVideosOperation({ operation });
+      } catch(e) {
+          console.error("Error polling for video operation status:", e);
+          // If polling itself fails, wait and retry.
+      }
+      
+      delay = Math.min(delay * 1.5, 30000); // Increase delay, maxing out at 30s
+    }
+
+    if (!operation.done) {
+        console.error("Video generation timed out after several attempts.");
+        return undefined;
     }
 
     const downloadLink = operation.response?.generatedVideos?.[0]?.video?.uri;
@@ -84,8 +101,8 @@ export const generateContentIdeas = async (character: CharacterProfile): Promise
     });
     const scenario = scenarioResponse.text.trim();
 
-    // 2. Generate Content Ideas for all platforms in parallel
-    const [youtubeResponse, instagramResponse, tiktokResponse, facebookResponse] = await Promise.all([
+    // 2. Generate Content Ideas for all platforms in parallel for robustness
+    const contentPromises = [
       // YouTube Idea
       ai.models.generateContent({
           model: "gemini-2.5-flash",
@@ -166,12 +183,39 @@ export const generateContentIdeas = async (character: CharacterProfile): Promise
             },
         },
       })
-    ]);
+    ];
     
-    const youtubeIdea: YouTubeShortsIdea = JSON.parse(youtubeResponse.text);
-    const instagramIdea: InstagramPostIdea = JSON.parse(instagramResponse.text);
-    const tiktokIdea: TikTokIdea = JSON.parse(tiktokResponse.text);
-    const facebookIdea: FacebookPostIdea = JSON.parse(facebookResponse.text);
+    const results = await Promise.allSettled(contentPromises);
+
+    const safeJsonParse = <T>(text: string | undefined, fallback: T): T => {
+        if (!text) return fallback;
+        try {
+            return JSON.parse(text) as T;
+        } catch (e) {
+            console.error("Failed to parse JSON:", text, e);
+            return fallback;
+        }
+    };
+
+    const youtubeResult = results[0];
+    const youtubeIdea: YouTubeShortsIdea = youtubeResult.status === 'fulfilled'
+        ? safeJsonParse(youtubeResult.value.text, { title: 'Error', script: 'Could not generate content.', visuals: 'N/A' })
+        : { title: 'Error', script: 'Could not generate content.', visuals: 'N/A' };
+
+    const instagramResult = results[1];
+    const instagramIdea: InstagramPostIdea = instagramResult.status === 'fulfilled'
+        ? safeJsonParse(instagramResult.value.text, { caption: 'Error: Could not generate content.', image_description: 'N/A', hashtags: [] })
+        : { caption: 'Error: Could not generate content.', image_description: 'N/A', hashtags: [] };
+
+    const tiktokResult = results[2];
+    const tiktokIdea: TikTokIdea = tiktokResult.status === 'fulfilled'
+        ? safeJsonParse(tiktokResult.value.text, { caption: 'Error: Could not generate content.', trending_sound: 'N/A', hashtags: [] })
+        : { caption: 'Error: Could not generate content.', trending_sound: 'N/A', hashtags: [] };
+
+    const facebookResult = results[3];
+    const facebookIdea: FacebookPostIdea = facebookResult.status === 'fulfilled'
+        ? safeJsonParse(facebookResult.value.text, { text_post: 'Error: Could not generate content.', hashtags: [] })
+        : { text_post: 'Error: Could not generate content.', hashtags: [] };
 
     // 3. Generate one Video for all platforms based on the scenario
     const videoUrl = await generateVideoForScenario(scenario, character.visualDescription);

@@ -17,7 +17,7 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 text-gray-100 font-sans">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-slate-900 text-gray-100 font-sans">
       <Header onReset={character ? handleReset : undefined} />
       <main className="container mx-auto px-4 py-8">
         {character ? (
